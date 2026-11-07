@@ -1,0 +1,7 @@
+const form=document.querySelector("#signup"),input=document.querySelector("#email"),button=document.querySelector("#submit"),feedback=document.querySelector("#feedback");
+document.querySelector("#year").textContent=new Date().getFullYear();
+const params=new URLSearchParams(location.search);if(params.get("ref"))sessionStorage.setItem("relay_referral",params.get("ref"));
+form.addEventListener("submit",async e=>{e.preventDefault();button.disabled=true;button.textContent="Saving your place…";feedback.className="";feedback.textContent="One second — adding you to the list.";
+try{const res=await fetch("/api/waitlist",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:input.value.trim(),referral_code:sessionStorage.getItem("relay_referral")||""})});const data=await res.json();if(!res.ok)throw new Error(data.error||"Could not join the list.");feedback.className="success";feedback.textContent=`You're in. You're number ${data.position} on the list.`;
+form.innerHTML=`<div class="success-card"><strong>You're on the list.</strong><span>Invite code: <code>${data.referral_code}</code></span><button type="button" id="copy">Copy invite link ↗</button></div>`;document.querySelector("#copy").addEventListener("click",async()=>{await navigator.clipboard.writeText(`${location.origin}/?ref=${data.referral_code}`);document.querySelector("#copy").textContent="Copied ✓";});
+}catch(err){feedback.className="error";feedback.textContent=err.message;button.disabled=false;button.innerHTML='Get early access <span>↗</span>';}});
