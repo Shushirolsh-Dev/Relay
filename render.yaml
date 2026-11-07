@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: relay
+    runtime: go
+    buildCommand: go build -o relay ./cmd/relay
+    startCommand: ./relay
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: DATABASE_PATH
+        value: /var/data/relay.db
+      - key: ADMIN_TOKEN
+        generateValue: true
+    disk:
+      name: relay-data
+      mountPath: /var/data
+      sizeGB: 1
